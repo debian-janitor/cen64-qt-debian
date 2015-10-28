@@ -1,0 +1,32 @@
+Source: cen64-qt
+Section: otherosfs
+Priority: optional
+Maintainer: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Build-Depends: debhelper (>= 9), qtbase5-dev, libquazip-qt5-dev, libqt5sql5-sqlite
+Standards-Version: 3.9.6
+Homepage: https://github.com/dh4/cen64-qt
+Vcs-Git: git://github.com/glaubitz/cen64-qt-debian.git
+Vcs-Browser: https://github.com/glaubitz/cen64-qt-debian/
+
+Package: cen64-qt
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: cen64
+Description: Cross-platform graphical frontend for the CEN64 emulator
+ CEN64-Qt is a cross-platform graphical frontend for the CEN64 emulator. Since
+ CEN64 itself provides a simple command line interface only, anyone who wants
+ to use this particular emulator with a little more convenience has to resort
+ to additional software which is where this package jumps in.
+ .
+ The frontend lists all available ROMs after adding them to the inventory with
+ the option to download additional information from external game databases on
+ the web. File paths for the necessary IPL files can be conveniently configured
+ from the settings menu as well as the paths where games save a stored and
+ recovered from.
+ .
+ Additional features include a log viewer for the emulator, a configurable view
+ for the ROM listing as well as a quick access menu to select the preferred
+ input device for the emulator such as different gamepads and a keyboard.
+ .
+ Naturally, all settings are automatically saved and restored such that they
+ only need to be configured once.

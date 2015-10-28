@@ -1,0 +1,5 @@
+cen64-qt (20150915-alpha-1) unstable; urgency=low
+
+  * Initial release (Closes: #798523).
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Wed, 28 Oct 2015 14:14:21 +0100
