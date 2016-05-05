@@ -32,10 +32,13 @@
 #ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
 
-#include <QFileDialog>
-#include <QListWidget>
+#include <QDialog>
 
-#include "global.h"
+class QCheckBox;
+class QComboBox;
+class QLabel;
+class QLineEdit;
+class QListWidget;
 
 
 namespace Ui {
@@ -55,6 +58,18 @@ private:
 
     Ui::SettingsDialog *ui;
 
+    QList<QCheckBox*> ctrlEnabled;
+    QList<QComboBox*> ctrlAccessory;
+    QList<QLabel*> ctrlAccessoryLabel;
+    QList<QLabel*> ctrlMemPakLabel;
+    QList<QLabel*> ctrlTPakROMLabel;
+    QList<QLabel*> ctrlTPakSaveLabel;
+    QList<QLineEdit*> ctrlMemPak;
+    QList<QLineEdit*> ctrlTPakROM;
+    QList<QLineEdit*> ctrlTPakSave;
+    QList<QPushButton*> ctrlMemPakButton;
+    QList<QPushButton*> ctrlTPakROMButton;
+    QList<QPushButton*> ctrlTPakSaveButton;
     QList<QWidget*> downloadEnable;
     QList<QWidget*> labelEnable;
     QList<QWidget*> listCoverEnable;
@@ -71,10 +86,15 @@ private slots:
     void browseBackground();
     void browseCatalog();
     void browseCen64();
-    void browseEEPROM();
+    void browseEEPROM4k();
+    void browseEEPROM16k();
+    void browseFlashRAM();
+    void browseMemPak();
     void browsePIF();
     void browseSaves();
     void browseSRAM();
+    void browseTPakROM();
+    void browseTPakSave();
     void editSettings();
     void listAddColumn();
     void listRemoveColumn();
@@ -89,10 +109,13 @@ private slots:
     void tableRemoveColumn();
     void tableSortDown();
     void tableSortUp();
+    void toggleAccessory(int index, int i = -1);
+    void toggleController(bool active, int i = -1);
     void toggleDownload(bool active);
     void toggleLabel(bool active);
     void toggleListCover(bool active);
     void toggleSaves(bool active);
+    void updateLanguageInfo();
 };
 
 #endif // SETTINGSDIALOG_H

@@ -13,8 +13,8 @@ macx {
 }
 
 TEMPLATE = app
-macx:ICON = macosx/cen64.icns
-win32:RC_FILE = windows/icon.rc
+macx:ICON = dist/macosx/cen64.icns
+win32:RC_FILE = dist/windows/icon.rc
 
 
 SOURCES += src/main.cpp \
@@ -49,6 +49,8 @@ RESOURCES += resources/cen64qt.qrc
 
 FORMS += src/settingsdialog.ui
 
+TRANSLATIONS += resources/locale/cen64-qt_fr.ts
+
 win32|macx|linux_quazip_static {
     CONFIG += staticlib
     DEFINES += QUAZIP_STATIC
@@ -62,12 +64,12 @@ win32|macx|linux_quazip_static {
         LIBS += -lquazip
     } else {
         # Debian distributions use a different library name for Qt5 quazip
-        system("uname -a | grep -E 'Debian|Ubuntu' > /dev/null") {
-              system("dpkg -l | grep libquazip5-dev | grep ^ii > /dev/null") {
-                  LIBS += -lquazip5
-              } else {
-                  LIBS += -lquazip-qt5
-              }
+        system("which dpkg > /dev/null 2>&1") {
+            system("dpkg -l | grep libquazip5-dev | grep ^ii > /dev/null") {
+                LIBS += -lquazip5
+            } else {
+                LIBS += -lquazip-qt5
+            }
         } else {
             LIBS += -lquazip5
         }

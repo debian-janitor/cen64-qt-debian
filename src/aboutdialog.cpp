@@ -30,6 +30,13 @@
  ***/
 
 #include "aboutdialog.h"
+#include "common.h"
+#include "global.h"
+
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QPlainTextEdit>
 
 
 AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent)
@@ -48,10 +55,11 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent)
     license->setReadOnly(true);
     licenseFile.close();
 
-    QString description = tr("A basic frontend for CEN64 using Qt.");
+    QString description = "<b>CEN64-Qt</b><br />" + tr("Version") + " " + getVersion() + "<br /><br />";
+    description += tr("A basic frontend for CEN64 using Qt.");
     QString copyright = "CEN64 Copyright (c) 2013, Tyler J. Stachecki";
-    QString cen64 = "<a href=\"http://www.cen64.com/\">CEN64 website</a>";
-    QString github = "<a href=\"https://github.com/dh4/cen64-qt\">Github repository</a>";
+    QString cen64 = "<a href=\"http://www.cen64.com/\">" + tr("CEN64 website") + "</a>";
+    QString github = "<a href=\"https://github.com/dh4/cen64-qt\">" + tr("GitHub repository") + "</a>";
 
     descriptionLabel = new QLabel(description, this);
     copyrightLabel = new QLabel(copyright, this);
