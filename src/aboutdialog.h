@@ -33,12 +33,11 @@
 #define ABOUTDIALOG_H
 
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QPlainTextEdit>
 
-#include "global.h"
+class QDialogButtonBox;
+class QGridLayout;
+class QLabel;
+class QPlainTextEdit;
 
 
 class AboutDialog : public QDialog

@@ -1,31 +1,30 @@
 # CEN64-Qt [![Build Status](https://travis-ci.org/dh4/cen64-qt.svg?branch=master)](https://travis-ci.org/dh4/cen64-qt)
 
-A basic cross-platform frontend for CEN64.
+A basic cross-platform frontend for [CEN64](http://cen64.com/).
 
 ![CEN64-Qt Grid View](https://dl.dropboxusercontent.com/u/232085155/cen64-qt/github.jpg)
 
 
 ## Getting CEN64-Qt
 
-### Stable
+### Release Builds
 
-Stable releases can be found on the [releases](https://github.com/dh4/cen64-qt/releases) page.
+Release builds can be found on the [releases](https://github.com/dh4/cen64-qt/releases) page.
 
 Note these are currently only alpha releases versioned with the date. I don't plan to adopt a version scheme until CEN64 is more stable.
 
-### Development
+### Development Builds
 
 Automatic builds of the latest git commit can be downloaded here:  
 Linux: [cen64-qt_linux_git-latest.tar.gz](https://s3.amazonaws.com/dh4/cen64-qt/latest/cen64-qt_linux_git-latest.tar.gz)  
 Windows: [cen64-qt_win_git-latest.zip](https://s3.amazonaws.com/dh4/cen64-qt/latest/cen64-qt_win_git-latest.zip)  
 OSX: [cen64-qt_osx_git-latest.dmg](https://s3.amazonaws.com/dh4/cen64-qt/latest/cen64-qt_osx_git-latest.dmg)
 
-Be aware that these may contain bugs not present in the stable releases.
+Be aware that these may contain bugs not present in the release builds.
 
+### Building (Linux)
 
-## Building
-
-### Linux
+First, obtain the source code for CEN64-Qt. You can either clone the repository with git or download an archive of the source code for a specific release from the [releases](https://github.com/dh4/cen64-qt/releases) page.
 
 You'll need to make sure you have qmake, g++, the Qt development libraries and the QuaZIP development files installed. On Debian/Ubuntu, this can be accomplished by:
 
@@ -33,7 +32,7 @@ You'll need to make sure you have qmake, g++, the Qt development libraries and t
 # apt-get install qt5-qmake g++ qtbase5-dev libquazip-qt5-dev libqt5sql5-sqlite
 ```
 
-Once the needed packages are installed, create the Makefile with qmake and then build with make:
+Once the needed packages are installed, create the Makefile with qmake and then build with make. Run the following commands from the directory that contains cen64-qt.pro:
 
 ```
 $ qmake
@@ -50,7 +49,7 @@ Install the Qt4 dependencies instead. On Debian/Ubuntu:
 # apt-get install qt4-qmake g++ libqt4-dev libquazip-dev libqt4-sql-sqlite
 ```
 
-Then create the Makefile with qmake and build with make:
+Then create the Makefile with qmake and build with make. Run the following commands from the directory that contains cen64-qt.pro:
 
 ```
 $ qmake-qt4

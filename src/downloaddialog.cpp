@@ -30,6 +30,13 @@
  ***/
 
 #include "downloaddialog.h"
+#include "common.h"
+#include "thegamesdbscrapper.h"
+
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
 
 
 DownloadDialog::DownloadDialog(QString fileText, QString defaultText, QString romMD5, QWidget *parent)
@@ -42,7 +49,7 @@ DownloadDialog::DownloadDialog(QString fileText, QString defaultText, QString ro
 
     downloadLayout = new QGridLayout(this);
 
-    fileLabel = new QLabel(tr("<b>File:</b> ") + fileText, this);
+    fileLabel = new QLabel("<b>" + tr("File") + ":</b> " + fileText, this);
 
     gameNameLabel = new QLabel(tr("Name of Game:"), this);
     gameIDLabel = new QLabel(tr("or Game ID:"), this);
