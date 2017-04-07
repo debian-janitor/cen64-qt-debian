@@ -29,67 +29,29 @@
  *
  ***/
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef THEGAMESDBSCRAPER_H
+#define THEGAMESDBSCRAPER_H
 
-#include <QGraphicsDropShadowEffect>
-#include <QString>
-#include <QPixmap>
+#include <QWidget>
 
-class QColor;
-class QSize;
+class QUrl;
 
 
-struct Rom {
-    QString fileName;
-    QString directory;
-    QString romMD5;
-    QString internalName;
-    QString zipFile;
+class TheGamesDBScraper : public QObject
+{
+    Q_OBJECT
+public:
+    explicit TheGamesDBScraper(QWidget *parent = 0, bool force = false);
+    void deleteGameInfo(QString fileName, QString identifier);
+    void downloadGameInfo(QString identifier, QString searchName, QString gameID = "");
 
-    QString baseName;
-    QString size;
-    int sortSize;
+private:
+    QByteArray getUrlContents(QUrl url);
+    void showError(QString error);
 
-    QString goodName;
-    QString CRC1;
-    QString CRC2;
-    QString players;
-    QString saveType;
-    QString rumble;
-
-    QString gameTitle;
-    QString releaseDate;
-    QString sortDate;
-    QString overview;
-    QString esrb;
-    QString genre;
-    QString publisher;
-    QString developer;
-    QString rating;
-
-    QPixmap image;
-
-    int count;
-    bool imageExists;
+    bool force;
+    bool keepGoing;
+    QWidget *parent;
 };
 
-bool romSorter(const Rom &firstRom, const Rom &lastRom);
-int getDefaultWidth(QString id, int imageWidth);
-int getGridSize(QString which);
-int getTableDataIndexFromName(QString infoName);
-int getTextSize();
-
-QByteArray byteswap(QByteArray romData);
-QStringList getZippedFiles(QString completeFileName);
-QByteArray *getZippedRom(QString romFileName, QString zipFile);
-QColor getColor(QString color, int transparency = 255);
-QString getDefaultLanguage();
-QString getTranslation(QString text);
-QGraphicsDropShadowEffect *getShadow(bool active);
-QSize getImageSize(QString view);
-QString getDataLocation();
-QString getRomInfo(QString identifier, const Rom *rom, bool removeWarn = false, bool sort = false);
-QString getVersion();
-
-#endif // COMMON_H
+#endif // THEGAMESDBSCRAPER_H

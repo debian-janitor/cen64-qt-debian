@@ -29,25 +29,54 @@
  *
  ***/
 
-#include "clickablewidget.h"
+#ifndef LISTVIEW_H
+#define LISTVIEW_H
 
-#include <QMouseEvent>
+#include <QScrollArea>
+
+class QVBoxLayout;
+struct Rom;
 
 
-ClickableWidget::ClickableWidget(QWidget *parent) : QWidget(parent)
+class ListView : public QScrollArea
 {
-}
+    Q_OBJECT
 
+public:
+    explicit ListView(QWidget *parent = 0);
+    void addToListView(Rom *currentRom, int count, bool ddEnabled);
+    int getCurrentRom();
+    QString getCurrentRomInfo(QString infoName);
+    QWidget *getCurrentRomWidget();
+    bool hasSelectedRom();
+    void resetView();
+    void saveListPosition();
+    void setListBackground();
 
-void ClickableWidget::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton)
-        emit singleClicked(this);
-}
+protected:
+    void keyPressEvent(QKeyEvent *event);
 
+signals:
+    void listItemSelected(bool active);
 
-void ClickableWidget::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton)
-        emit doubleClicked(this);
-}
+private:
+    int currentListRom;
+    bool listCurrent;
+    int savedListRom;
+    QString savedListRomFilename;
+    int positionx;
+    int positiony;
+
+    QVBoxLayout *listLayout;
+    QWidget *listWidget;
+    QWidget *parent;
+
+private slots:
+    void highlightListWidget(QWidget *current);
+    void highlightListWidgetSetMargin();
+    void selectNextRom(QWidget *current, QString keypress);
+    void setListPosition();
+
+};
+
+#endif // LISTVIEW_H

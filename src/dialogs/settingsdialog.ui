@@ -26,7 +26,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pathsWidget">
       <attribute name="title">
@@ -150,7 +150,7 @@
           <item row="0" column="0">
            <layout class="QGridLayout" name="pathsLayout">
             <item row="0" column="2">
-             <widget class="QPushButton" name="cen64Button">
+             <widget class="QPushButton" name="emulatorButton">
               <property name="text">
                <string>Browse...</string>
               </property>
@@ -191,14 +191,14 @@
              </widget>
             </item>
             <item row="0" column="0">
-             <widget class="QLabel" name="cen64PathLabel">
+             <widget class="QLabel" name="emulatorPathLabel">
               <property name="text">
                <string>CEN64 executable: </string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLineEdit" name="cen64Path"/>
+             <widget class="QLineEdit" name="emulatorPath"/>
             </item>
             <item row="2" column="2">
              <widget class="QPushButton" name="ddButton">
@@ -1090,38 +1090,38 @@
          <layout class="QGridLayout" name="gridLayout_13">
           <item row="2" column="0">
            <layout class="QGridLayout" name="gridOtherLayout" columnstretch="0,1,1,0" columnminimumwidth="150,0,0,0">
-            <item row="0" column="3">
+            <item row="1" column="3">
              <widget class="QPushButton" name="backgroundButton">
               <property name="text">
                <string>Browse...</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
+            <item row="1" column="0">
              <widget class="QLabel" name="backgroundLabel">
               <property name="text">
                <string>Custom Background:</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QLabel" name="gridSortLabel">
               <property name="text">
                <string>Sorting:</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1" colspan="2">
+            <item row="1" column="1" colspan="2">
              <widget class="QLineEdit" name="backgroundPath"/>
             </item>
-            <item row="1" column="2" colspan="2">
+            <item row="2" column="2" colspan="2">
              <widget class="QCheckBox" name="gridDescendingOption">
               <property name="text">
                <string>Descending</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
+            <item row="2" column="1">
              <widget class="QComboBox" name="gridSortBox">
               <property name="maximumSize">
                <size>
@@ -1130,6 +1130,16 @@
                </size>
               </property>
              </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="bgThemeLabel">
+              <property name="text">
+               <string>Background:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="bgThemeBox"/>
             </item>
            </layout>
           </item>
@@ -1156,7 +1166,7 @@
            </spacer>
           </item>
           <item row="0" column="0">
-           <layout class="QGridLayout" name="gridImageLayout" rowstretch="0,0,0,0" columnstretch="0,0" columnminimumwidth="150,0">
+           <layout class="QGridLayout" name="gridImageLayout" rowstretch="0,0,0,0" columnstretch="0,0,0" columnminimumwidth="150,0,0">
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -1243,6 +1253,13 @@
                 <width>100</width>
                 <height>16777215</height>
                </size>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QCheckBox" name="autoColumnOption">
+              <property name="text">
+               <string>Adjust Automatically</string>
               </property>
              </widget>
             </item>
@@ -1392,21 +1409,21 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="3">
+         <item row="6" column="3">
           <widget class="QCheckBox" name="listDescendingOption">
            <property name="text">
             <string>Descending</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="listSortLabel">
            <property name="text">
             <string>Sorting:</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1" colspan="2">
+         <item row="6" column="1" colspan="2">
           <widget class="QComboBox" name="listSortBox">
            <property name="maximumSize">
             <size>
@@ -1415,6 +1432,9 @@
             </size>
            </property>
           </widget>
+         </item>
+         <item row="3" column="1" colspan="2">
+          <widget class="QComboBox" name="listSizeBox"/>
          </item>
          <item row="2" column="3" colspan="2">
           <widget class="QCheckBox" name="listHeaderOption">
@@ -1430,8 +1450,25 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1" colspan="2">
-          <widget class="QComboBox" name="listSizeBox"/>
+         <item row="4" column="0">
+          <widget class="QLabel" name="listTextLabel">
+           <property name="text">
+            <string>Text Size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="listThemeLabel">
+           <property name="text">
+            <string>Theme:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1" colspan="2">
+          <widget class="QComboBox" name="listTextBox"/>
+         </item>
+         <item row="5" column="1" colspan="2">
+          <widget class="QComboBox" name="listThemeBox"/>
          </item>
         </layout>
        </item>
@@ -1605,11 +1642,11 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>cen64Path</tabstop>
+  <tabstop>emulatorPath</tabstop>
   <tabstop>pifPath</tabstop>
   <tabstop>ddPath</tabstop>
   <tabstop>catalogPath</tabstop>
-  <tabstop>cen64Button</tabstop>
+  <tabstop>emulatorButton</tabstop>
   <tabstop>pifButton</tabstop>
   <tabstop>ddButton</tabstop>
   <tabstop>catalogButton</tabstop>
@@ -1661,11 +1698,13 @@
   <tabstop>tableStretchOption</tabstop>
   <tabstop>gridSizeBox</tabstop>
   <tabstop>columnCountBox</tabstop>
+  <tabstop>autoColumnOption</tabstop>
   <tabstop>shadowInactiveBox</tabstop>
   <tabstop>shadowActiveBox</tabstop>
   <tabstop>labelOption</tabstop>
   <tabstop>labelTextBox</tabstop>
   <tabstop>labelColorBox</tabstop>
+  <tabstop>bgThemeBox</tabstop>
   <tabstop>backgroundPath</tabstop>
   <tabstop>backgroundButton</tabstop>
   <tabstop>gridSortBox</tabstop>
@@ -1679,11 +1718,14 @@
   <tabstop>listCoverOption</tabstop>
   <tabstop>listHeaderOption</tabstop>
   <tabstop>listSizeBox</tabstop>
+  <tabstop>listTextBox</tabstop>
+  <tabstop>listThemeBox</tabstop>
   <tabstop>listSortBox</tabstop>
   <tabstop>listDescendingOption</tabstop>
   <tabstop>downloadOption</tabstop>
   <tabstop>outputOption</tabstop>
   <tabstop>parametersLine</tabstop>
+  <tabstop>languageBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

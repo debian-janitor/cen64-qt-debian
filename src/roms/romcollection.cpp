@@ -30,9 +30,11 @@
  ***/
 
 #include "romcollection.h"
-#include "common.h"
-#include "global.h"
-#include "thegamesdbscrapper.h"
+
+#include "../global.h"
+#include "../common.h"
+
+#include "thegamesdbscraper.h"
 
 #include <QCoreApplication>
 #include <QCryptographicHash>
@@ -95,7 +97,7 @@ Rom RomCollection::addRom(QByteArray *romData, QString fileName, QString directo
 }
 
 
-void RomCollection::addRoms()
+int RomCollection::addRoms()
 {
     emit updateStarted();
 
@@ -114,17 +116,18 @@ void RomCollection::addRoms()
     QList<Rom> roms;
     QList<Rom> ddRoms;
 
+    database.open();
+    QSqlQuery query("DELETE FROM rom_collection", database);
+
     if (totalCount != 0) {
         int count = 0;
         setupProgressDialog(totalCount);
 
-        database.open();
-        QSqlQuery query("DELETE FROM rom_collection", database);
         query.prepare(QString("INSERT INTO rom_collection ")
                       + "(filename, directory, internal_name, md5, zip_file, size, dd_rom) "
                       + "VALUES (:filename, :directory, :internal_name, :md5, :zip_file, :size, :dd_rom)");
 
-        scrapper = new TheGamesDBScrapper(parent);
+        scraper = new TheGamesDBScraper(parent);
 
         foreach (QString romPath, romPaths)
         {
@@ -145,6 +148,9 @@ void RomCollection::addRoms()
                         //check for ROM files
                         QByteArray *romData = getZippedRom(zippedFile, completeFileName);
 
+                        if (fileTypes.contains("*.v64"))
+                            *romData = byteswap(*romData);
+
                         if (romData->left(4).toHex() == "80371240") { //Z64 ROM
                             roms.append(addRom(romData, zippedFile, romPath, fileName, query));
                             romCount++;
@@ -159,6 +165,9 @@ void RomCollection::addRoms()
                     file.open(QIODevice::ReadOnly);
                     QByteArray *romData = new QByteArray(file.readAll());
                     file.close();
+
+                    if (fileTypes.contains("*.v64"))
+                        *romData = byteswap(*romData);
 
                     if (romData->left(4).toHex() == "80371240") { //Z64 ROM
                         roms.append(addRom(romData, fileName, romPath, "", query));
@@ -180,12 +189,13 @@ void RomCollection::addRoms()
                 QMessageBox::warning(parent, tr("Warning"), tr("No ROMs found in ") + romPath + ".");
         }
 
-        delete scrapper;
-        database.close();
+        delete scraper;
         progress->close();
     } else if (romPaths.size() != 0) {
         QMessageBox::warning(parent, tr("Warning"), tr("No ROMs found."));
     }
+
+    database.close();
 
     //Emit signals for regular roms
     qSort(roms.begin(), roms.end(), romSorter);
@@ -200,10 +210,12 @@ void RomCollection::addRoms()
         emit ddRomAdded(&ddRoms[i]);
 
     emit updateEnded(roms.size());
+
+    return roms.size();
 }
 
 
-void RomCollection::cachedRoms(bool imageUpdated)
+int RomCollection::cachedRoms(bool imageUpdated)
 {
     emit updateStarted(imageUpdated);
 
@@ -215,10 +227,8 @@ void RomCollection::cachedRoms(bool imageUpdated)
     int romCount = query.at() + 1;
     query.seek(-1);
 
-    if (romCount == -1) { //Nothing cached so try adding ROMs instead
-        addRoms();
-        return;
-    }
+    if (romCount == -1) //Nothing cached so try adding ROMs instead
+        return addRoms();
 
     QList<Rom> roms;
     QList<Rom> ddRoms;
@@ -285,6 +295,8 @@ void RomCollection::cachedRoms(bool imageUpdated)
         emit ddRomAdded(&ddRoms[i]);
 
     emit updateEnded(roms.size(), true);
+
+    return roms.size();
 }
 
 
@@ -302,7 +314,15 @@ QStringList RomCollection::getFileTypes(bool archives)
 void RomCollection::initializeRom(Rom *currentRom, bool cached)
 {
     QSettings *romCatalog = new QSettings(parent);
+
     QString catalogFile = SETTINGS.value("Paths/catalog", "").toString();
+    if (catalogFile == "") {
+        QString dataPath = SETTINGS.value("Paths/data", "").toString();
+        QDir dataDir(dataPath);
+
+        if (QFileInfo(dataDir.absoluteFilePath("mupen64plus.ini")).exists())
+            catalogFile = dataDir.absoluteFilePath("mupen64plus.ini");
+    }
 
     QDir romDir(currentRom->directory);
 
@@ -346,13 +366,13 @@ void RomCollection::initializeRom(Rom *currentRom, bool cached)
     if (!cached && SETTINGS.value("Other/downloadinfo", "").toString() == "true") {
         if (currentRom->goodName != getTranslation("Unknown ROM") &&
             currentRom->goodName != getTranslation("Requires catalog file")) {
-            scrapper->downloadGameInfo(currentRom->romMD5, currentRom->goodName);
+            scraper->downloadGameInfo(currentRom->romMD5, currentRom->goodName);
         } else {
             //tweak internal name by adding spaces to get better results
             QString search = currentRom->internalName;
             search.replace(QRegExp("([a-z])([A-Z])"),"\\1 \\2");
             search.replace(QRegExp("([^ \\d])(\\d)"),"\\1 \\2");
-            scrapper->downloadGameInfo(currentRom->romMD5, search);
+            scraper->downloadGameInfo(currentRom->romMD5, search);
         }
 
     }
@@ -442,10 +462,10 @@ void RomCollection::setupDatabase()
 {
     // Bump this when updating rom_collection structure
     // Will cause clients to delete and recreate the table
-    int dbVersion = 1;
+    int dbVersion = 2;
 
     database = QSqlDatabase::addDatabase("QSQLITE");
-    database.setDatabaseName(getDataLocation() + "/cen64-qt.sqlite");
+    database.setDatabaseName(getDataLocation() + "/"+AppNameLower+".sqlite");
 
     if (!database.open())
         QMessageBox::warning(parent, tr("Database Not Loaded"),

@@ -29,33 +29,56 @@
  *
  ***/
 
-#ifndef ABOUTDIALOG_H
-#define ABOUTDIALOG_H
+#ifndef GRIDVIEW_H
+#define GRIDVIEW_H
 
-#include <QDialog>
+#include <QScrollArea>
 
-class QDialogButtonBox;
 class QGridLayout;
-class QLabel;
-class QPlainTextEdit;
+struct Rom;
 
 
-class AboutDialog : public QDialog
+class GridView : public QScrollArea
 {
     Q_OBJECT
 
 public:
-    explicit AboutDialog(QWidget *parent = 0);
+    explicit GridView(QWidget *parent = 0);
+    void addToGridView(Rom *currentRom, int count, bool ddEnabled);
+    int getCurrentRom();
+    QString getCurrentRomInfo(QString infoName);
+    QWidget *getCurrentRomWidget();
+    bool hasSelectedRom();
+    void resetView();
+    void saveGridPosition();
+    void setGridBackground();
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
+    void resizeEvent(QResizeEvent *event);
+
+signals:
+    void gridItemSelected(bool active);
 
 private:
-    QDialogButtonBox *buttonBox;
-    QGridLayout *aboutLayout;
-    QLabel *cen64Link;
-    QLabel *copyrightLabel;
-    QLabel *descriptionLabel;
-    QLabel *githubLink;
-    QLabel *icon;
-    QPlainTextEdit *license;
+    void updateGridColumns(int width);
+
+    int autoColumnCount;
+    int currentGridRom;
+    bool gridCurrent;
+    int savedGridRom;
+    QString savedGridRomFilename;
+    int positionx;
+    int positiony;
+
+    QGridLayout *gridLayout;
+    QWidget *gridWidget;
+    QWidget *parent;
+
+private slots:
+    void highlightGridWidget(QWidget *current);
+    void selectNextRom(QWidget *current, QString keypress);
+    void setGridPosition();
 };
 
-#endif // ABOUTDIALOG_H
+#endif // GRIDVIEW_H

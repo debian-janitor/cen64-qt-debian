@@ -30,12 +30,14 @@
  ***/
 
 #include "common.h"
+
 #include "global.h"
 
 #include <QColor>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
+#include <QLocale>
 #include <QSize>
 
 #include <quazip/quazip.h>
@@ -75,10 +77,10 @@ QString getDataLocation()
 
 #if QT_VERSION >= 0x050000
     dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
-                    .replace("CEN64/CEN64-Qt","cen64-qt");
+                    .replace(ParentName+"/"+AppName,AppNameLower);
 #else
     dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation)
-                    .remove("data/").replace("CEN64/CEN64-Qt","cen64-qt");
+                    .remove("data/").replace(ParentName+"/"+AppName,AppNameLower);
 #endif
 
 #endif
@@ -110,6 +112,18 @@ QColor getColor(QString color, int transparency)
     }
 
     return QColor(0, 0, 0, 255);
+}
+
+
+QString getDefaultLanguage()
+{
+    QString systemLanguage = QLocale::system().name().left(2);
+
+    //Add other languages here as translations are done
+    if (systemLanguage == "fr")
+        return "FR";
+    else
+        return "EN";
 }
 
 
@@ -272,6 +286,36 @@ QGraphicsDropShadowEffect *getShadow(bool active)
 }
 
 
+int getTableDataIndexFromName(QString infoName)
+{
+    if (infoName == "fileName")
+        return 0;
+    else if (infoName == "dirName")
+        return 1;
+    else if (infoName == "search")
+        return 2;
+    else if (infoName == "romMD5")
+        return 3;
+    else if (infoName == "zipFile")
+        return 4;
+
+    return 0;
+}
+
+
+int getTextSize()
+{
+    QString size = SETTINGS.value("List/textsize","Medium").toString();
+
+    if (size == "Extra Small") return 7;
+    if (size == "Small")       return 9;
+    if (size == "Medium")      return 10;
+    if (size == "Large")       return 12;
+    if (size == "Extra Large") return 14;
+    return 10;
+}
+
+
 QString getTranslation(QString text)
 {
     if (text == "GoodName")                     return QObject::tr("GoodName");
@@ -343,10 +387,10 @@ bool romSorter(const Rom &firstRom, const Rom &lastRom)
     QString sort, direction;
 
     QString layout = SETTINGS.value("View/layout", "None").toString();
-    if (layout == "Grid View") {
+    if (layout == "grid") {
         sort = SETTINGS.value("Grid/sort", "Filename").toString();
         direction = SETTINGS.value("Grid/sortdirection", "ascending").toString();
-    } else if (layout == "List View") {
+    } else if (layout == "list") {
         sort = SETTINGS.value("List/sort", "Filename").toString();
         direction = SETTINGS.value("List/sortdirection", "ascending").toString();
     } else //just return sort by filename

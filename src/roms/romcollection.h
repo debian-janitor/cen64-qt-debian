@@ -29,29 +29,55 @@
  *
  ***/
 
-#ifndef THEGAMESDBSCRAPPER_H
-#define THEGAMESDBSCRAPPER_H
+#ifndef ROMCOLLECTION_H
+#define ROMCOLLECTION_H
 
-#include <QWidget>
+#include <QObject>
+#include <QStringList>
+#include <QtSql/QSqlDatabase>
 
-class QUrl;
+class QDir;
+class QProgressDialog;
+class TheGamesDBScraper;
+struct Rom;
 
 
-class TheGamesDBScrapper : public QObject
+class RomCollection : public QObject
 {
     Q_OBJECT
 public:
-    explicit TheGamesDBScrapper(QWidget *parent = 0, bool force = false);
-    void deleteGameInfo(QString fileName, QString identifier);
-    void downloadGameInfo(QString identifier, QString searchName, QString gameID = "");
+    explicit RomCollection(QStringList fileTypes, QStringList romPaths, QWidget *parent = 0);
+    int cachedRoms(bool imageUpdated = false);
+    void updatePaths(QStringList romPaths);
+
+    QStringList getFileTypes(bool archives = false);
+    QStringList romPaths;
+
+public slots:
+    int addRoms();
+
+signals:
+    void ddRomAdded(Rom *currentRom);
+    void romAdded(Rom *currentRom, int count);
+    void updateEnded(int romCount, bool cached = false);
+    void updateStarted(bool imageUpdated = false);
 
 private:
-    QByteArray getUrlContents(QUrl url);
-    void showError(QString error);
+    void initializeRom(Rom *currentRom, bool cached);
+    void setupDatabase();
+    void setupProgressDialog(int size);
 
-    bool force;
-    bool keepGoing;
+    Rom addRom(QByteArray *romData, QString fileName, QString directory, QString zipFile, QSqlQuery query,
+               bool ddRom = false);
+
+    QStringList fileTypes;
+    QStringList scanDirectory(QDir romDir);
+
     QWidget *parent;
+    QProgressDialog *progress;
+    QSqlDatabase database;
+
+    TheGamesDBScraper *scraper;
 };
 
-#endif // THEGAMESDBSCRAPPER_H
+#endif // ROMCOLLECTION_H

@@ -29,9 +29,10 @@
  *
  ***/
 
-#include "thegamesdbscrapper.h"
-#include "common.h"
-#include "global.h"
+#include "thegamesdbscraper.h"
+
+#include "../global.h"
+#include "../common.h"
 
 #include <QDir>
 #include <QEventLoop>
@@ -46,7 +47,7 @@
 #include <QtXml/QDomDocument>
 
 
-TheGamesDBScrapper::TheGamesDBScrapper(QWidget *parent, bool force) : QObject(parent)
+TheGamesDBScraper::TheGamesDBScraper(QWidget *parent, bool force) : QObject(parent)
 {
     this->parent = parent;
     this->force = force;
@@ -54,18 +55,19 @@ TheGamesDBScrapper::TheGamesDBScrapper(QWidget *parent, bool force) : QObject(pa
 }
 
 
-void TheGamesDBScrapper::deleteGameInfo(QString fileName, QString identifier)
+void TheGamesDBScraper::deleteGameInfo(QString fileName, QString identifier)
 {
     QString text;
     text = QString(tr("<b>NOTE:</b> If you are deleting this game's information because the game doesn't "))
-                 + tr("exist on TheGamesDB and CEN64-Qt pulled the information for different game, it's ")
+                 + tr("exist on TheGamesDB and <AppName> pulled the information for different game, it's ")
                  + tr("better to create an account on")+" <a href=\"http://thegamesdb.net/\">TheGamesDB</a> "
                  + tr("and add the game so other users can benefit as well.")
                  + "<br /><br />"
-                 + tr("This will cause CEN64-Qt to not update the information for this game until you ")
+                 + tr("This will cause <AppName> to not update the information for this game until you ")
                  + tr("force it with \"Download/Update Info...\"")
                  + "<br /><br />"
                  + tr("Delete the current information for") + " <b>" + fileName + "</b>?";
+    text.replace("<AppName>",AppName);
 
     int answer = QMessageBox::question(parent, tr("Delete Game Information"), text,
                                        QMessageBox::Yes | QMessageBox::No);
@@ -101,7 +103,7 @@ void TheGamesDBScrapper::deleteGameInfo(QString fileName, QString identifier)
 }
 
 
-void TheGamesDBScrapper::downloadGameInfo(QString identifier, QString searchName, QString gameID)
+void TheGamesDBScraper::downloadGameInfo(QString identifier, QString searchName, QString gameID)
 {
     if (keepGoing && identifier != "") {
         if (force) parent->setEnabled(false);
@@ -131,6 +133,9 @@ void TheGamesDBScrapper::downloadGameInfo(QString identifier, QString searchName
                 searchName = "Majora's Mask";
             else if (searchName == "Legend of Zelda, The - Ocarina of Time - Master Quest")
                 searchName = "Master Quest";
+            else if (searchName == "Legend of Zelda, The - Ocarina of Time" ||
+                     searchName == "THE LEGEND OF ZELDA")
+                searchName = "Ocarina of Time";
             else if (searchName.toLower() == "f-zero x")
                 gameID = "10836";
 
@@ -253,13 +258,13 @@ void TheGamesDBScrapper::downloadGameInfo(QString identifier, QString searchName
 }
 
 
-QByteArray TheGamesDBScrapper::getUrlContents(QUrl url)
+QByteArray TheGamesDBScraper::getUrlContents(QUrl url)
 {
     QNetworkAccessManager *manager = new QNetworkAccessManager;
 
     QNetworkRequest request;
     request.setUrl(url);
-    request.setRawHeader("User-Agent", "CEN64-Qt");
+    request.setRawHeader("User-Agent", AppName.toUtf8().constData());
     QNetworkReply *reply = manager->get(request);
 
     QTimer timer;
@@ -286,7 +291,7 @@ QByteArray TheGamesDBScrapper::getUrlContents(QUrl url)
 }
 
 
-void TheGamesDBScrapper::showError(QString error)
+void TheGamesDBScraper::showError(QString error)
 {
     QString question = "\n\n" + tr("Continue scraping information?");
 
