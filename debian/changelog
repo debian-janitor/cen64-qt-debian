@@ -1,3 +1,11 @@
+cen64-qt (20160829-alpha-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update years in debian/copyright.
+  * Remove stray comma in debian/copyright.
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Fri, 07 Apr 2017 19:54:05 +0200
+
 cen64-qt (20160405-alpha-1) unstable; urgency=medium
 
   * New upstream release.
