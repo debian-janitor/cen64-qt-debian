@@ -30,8 +30,10 @@
  ***/
 
 #include "downloaddialog.h"
-#include "common.h"
-#include "thegamesdbscrapper.h"
+
+#include "../common.h"
+
+#include "../roms/thegamesdbscraper.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -88,6 +90,6 @@ void DownloadDialog::runDownloader()
 {
     close();
 
-    scrapper = new TheGamesDBScrapper(parent, true);
-    scrapper->downloadGameInfo(romMD5, gameNameField->text(), gameIDField->text());
+    scraper = new TheGamesDBScraper(parent, true);
+    scraper->downloadGameInfo(romMD5, gameNameField->text(), gameIDField->text());
 }

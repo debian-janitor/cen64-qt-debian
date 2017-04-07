@@ -85,7 +85,7 @@ private slots:
     void browse64DD();
     void browseBackground();
     void browseCatalog();
-    void browseCen64();
+    void browseEmulator();
     void browseEEPROM4k();
     void browseEEPROM16k();
     void browseFlashRAM();
@@ -96,6 +96,7 @@ private slots:
     void browseTPakROM();
     void browseTPakSave();
     void editSettings();
+    void hideBGTheme(QString imagePath);
     void listAddColumn();
     void listRemoveColumn();
     void listSortDown();
@@ -112,6 +113,7 @@ private slots:
     void toggleAccessory(int index, int i = -1);
     void toggleController(bool active, int i = -1);
     void toggleDownload(bool active);
+    void toggleGridColumn(bool active);
     void toggleLabel(bool active);
     void toggleListCover(bool active);
     void toggleSaves(bool active);

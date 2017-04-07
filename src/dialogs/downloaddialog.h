@@ -29,27 +29,39 @@
  *
  ***/
 
-#ifndef CLICKABLEWIDGET_H
-#define CLICKABLEWIDGET_H
+#ifndef DOWNLOADDIALOG_H
+#define DOWNLOADDIALOG_H
 
-#include <QWidget>
+#include <QDialog>
 
-class QMouseEvent;
+class QDialogButtonBox;
+class QGridLayout;
+class QLabel;
+class QLineEdit;
+class TheGamesDBScraper;
 
 
-class ClickableWidget : public QWidget
+class DownloadDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ClickableWidget(QWidget *parent = 0);
+    explicit DownloadDialog(QString fileText, QString defaultText, QString romMD5, QWidget *parent = 0);
 
-protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *event);
+private:
+    QDialogButtonBox *downloadButtonBox;
+    QGridLayout *downloadLayout;
+    QLabel *fileLabel;
+    QLabel *gameNameLabel;
+    QLabel *gameIDLabel;
+    QLineEdit *gameNameField;
+    QLineEdit *gameIDField;
+    QString romMD5;
+    QWidget *parent;
 
-signals:
-    void singleClicked(QWidget *current);
-    void doubleClicked(QWidget *current);
+    TheGamesDBScraper *scraper;
+
+private slots:
+    void runDownloader();
 };
 
-#endif // CLICKABLEWIDGET_H
+#endif // DOWNLOADDIALOG_H

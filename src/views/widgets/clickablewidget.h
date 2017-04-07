@@ -29,67 +29,30 @@
  *
  ***/
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef CLICKABLEWIDGET_H
+#define CLICKABLEWIDGET_H
 
-#include <QGraphicsDropShadowEffect>
-#include <QString>
-#include <QPixmap>
+#include <QWidget>
 
-class QColor;
-class QSize;
+class QMouseEvent;
 
 
-struct Rom {
-    QString fileName;
-    QString directory;
-    QString romMD5;
-    QString internalName;
-    QString zipFile;
+class ClickableWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ClickableWidget(QWidget *parent = 0);
 
-    QString baseName;
-    QString size;
-    int sortSize;
+protected:
+    void keyPressEvent(QKeyEvent* event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 
-    QString goodName;
-    QString CRC1;
-    QString CRC2;
-    QString players;
-    QString saveType;
-    QString rumble;
-
-    QString gameTitle;
-    QString releaseDate;
-    QString sortDate;
-    QString overview;
-    QString esrb;
-    QString genre;
-    QString publisher;
-    QString developer;
-    QString rating;
-
-    QPixmap image;
-
-    int count;
-    bool imageExists;
+signals:
+    void arrowPressed(QWidget *current, QString keypress);
+    void enterPressed(QWidget *current);
+    void singleClicked(QWidget *current);
+    void doubleClicked(QWidget *current);
 };
 
-bool romSorter(const Rom &firstRom, const Rom &lastRom);
-int getDefaultWidth(QString id, int imageWidth);
-int getGridSize(QString which);
-int getTableDataIndexFromName(QString infoName);
-int getTextSize();
-
-QByteArray byteswap(QByteArray romData);
-QStringList getZippedFiles(QString completeFileName);
-QByteArray *getZippedRom(QString romFileName, QString zipFile);
-QColor getColor(QString color, int transparency = 255);
-QString getDefaultLanguage();
-QString getTranslation(QString text);
-QGraphicsDropShadowEffect *getShadow(bool active);
-QSize getImageSize(QString view);
-QString getDataLocation();
-QString getRomInfo(QString identifier, const Rom *rom, bool removeWarn = false, bool sort = false);
-QString getVersion();
-
-#endif // COMMON_H
+#endif // CLICKABLEWIDGET_H

@@ -29,67 +29,43 @@
  *
  ***/
 
-#ifndef COMMON_H
-#define COMMON_H
+#include "clickablewidget.h"
 
-#include <QGraphicsDropShadowEffect>
-#include <QString>
-#include <QPixmap>
-
-class QColor;
-class QSize;
+#include <QMouseEvent>
 
 
-struct Rom {
-    QString fileName;
-    QString directory;
-    QString romMD5;
-    QString internalName;
-    QString zipFile;
+ClickableWidget::ClickableWidget(QWidget *parent) : QWidget(parent)
+{
+    setFocusPolicy(Qt::StrongFocus);
+}
 
-    QString baseName;
-    QString size;
-    int sortSize;
 
-    QString goodName;
-    QString CRC1;
-    QString CRC2;
-    QString players;
-    QString saveType;
-    QString rumble;
+void ClickableWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Up)
+        emit arrowPressed(this, "UP");
+    else if (event->key() == Qt::Key_Down)
+        emit arrowPressed(this, "DOWN");
+    else if (event->key() == Qt::Key_Left)
+        emit arrowPressed(this, "LEFT");
+    else if (event->key() == Qt::Key_Right)
+        emit arrowPressed(this, "RIGHT");
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+        emit enterPressed(this);
+    else
+        QWidget::keyPressEvent(event);
+}
 
-    QString gameTitle;
-    QString releaseDate;
-    QString sortDate;
-    QString overview;
-    QString esrb;
-    QString genre;
-    QString publisher;
-    QString developer;
-    QString rating;
 
-    QPixmap image;
+void ClickableWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
+        emit singleClicked(this);
+}
 
-    int count;
-    bool imageExists;
-};
 
-bool romSorter(const Rom &firstRom, const Rom &lastRom);
-int getDefaultWidth(QString id, int imageWidth);
-int getGridSize(QString which);
-int getTableDataIndexFromName(QString infoName);
-int getTextSize();
-
-QByteArray byteswap(QByteArray romData);
-QStringList getZippedFiles(QString completeFileName);
-QByteArray *getZippedRom(QString romFileName, QString zipFile);
-QColor getColor(QString color, int transparency = 255);
-QString getDefaultLanguage();
-QString getTranslation(QString text);
-QGraphicsDropShadowEffect *getShadow(bool active);
-QSize getImageSize(QString view);
-QString getDataLocation();
-QString getRomInfo(QString identifier, const Rom *rom, bool removeWarn = false, bool sort = false);
-QString getVersion();
-
-#endif // COMMON_H
+void ClickableWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+        emit doubleClicked(this);
+}

@@ -30,6 +30,7 @@
  ***/
 
 #include "global.h"
+#include "common.h"
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -43,18 +44,18 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
 
     QTranslator translator;
-    QString language = SETTINGS.value("language", "EN").toString();
+    QString language = SETTINGS.value("language", getDefaultLanguage()).toString();
 
     if (language != "EN") {
-        QString resource = ":/locale/cen64-qt_"+language.toLower()+".qm";
+        QString resource = ":/locale/"+AppNameLower+"_"+language.toLower()+".qm";
         if (QFileInfo(resource).exists()) {
             translator.load(resource);
             application.installTranslator(&translator);
         }
     }
 
-    QCoreApplication::setOrganizationName("CEN64");
-    QCoreApplication::setApplicationName("CEN64-Qt");
+    QCoreApplication::setOrganizationName(ParentName);
+    QCoreApplication::setApplicationName(AppName);
 
     MainWindow window;
 

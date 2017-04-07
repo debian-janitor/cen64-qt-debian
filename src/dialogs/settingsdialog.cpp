@@ -31,8 +31,9 @@
 
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
-#include "common.h"
-#include "global.h"
+
+#include "../global.h"
+#include "../common.h"
 
 #include <QFileDialog>
 #include <QListWidget>
@@ -46,7 +47,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
 
 
     //Populate Paths tab
-    ui->cen64Path->setText(SETTINGS.value("Paths/cen64", "").toString());
+    ui->emulatorPath->setText(SETTINGS.value("Paths/cen64", "").toString());
     ui->pifPath->setText(SETTINGS.value("Paths/pifrom", "").toString());
     ui->ddPath->setText(SETTINGS.value("Paths/ddiplrom", "").toString());
     ui->catalogPath->setText(SETTINGS.value("Paths/catalog", "").toString());
@@ -87,7 +88,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
     } else
         toggleSaves(false);
 
-    connect(ui->cen64Button, SIGNAL(clicked()), this, SLOT(browseCen64()));
+    connect(ui->emulatorButton, SIGNAL(clicked()), this, SLOT(browseEmulator()));
     connect(ui->pifButton, SIGNAL(clicked()), this, SLOT(browsePIF()));
     connect(ui->ddButton, SIGNAL(clicked()), this, SLOT(browse64DD()));
     connect(ui->catalogButton, SIGNAL(clicked()), this, SLOT(browseCatalog()));
@@ -235,11 +236,12 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
 
 
     //Populate Grid tab
-    int gridSizeIndex = 0, activeIndex = 0, inactiveIndex = 0, labelColorIndex = 0;
+    int gridSizeIndex = 0, activeIndex = 0, inactiveIndex = 0, labelColorIndex = 0, bgThemeIndex = 0;
     QString currentGridSize = SETTINGS.value("Grid/imagesize","Medium").toString();
     QString currentActiveColor = SETTINGS.value("Grid/activecolor","Cyan").toString();
     QString currentInactiveColor = SETTINGS.value("Grid/inactivecolor","Black").toString();
     QString currentLabelColor = SETTINGS.value("Grid/labelcolor","White").toString();
+    QString currentBGTheme = SETTINGS.value("Grid/theme","Normal").toString();
 
     QList<QStringList> colors;
     colors << (QStringList() << tr("Black")      << "Black")
@@ -256,6 +258,11 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
            << (QStringList() << tr("Yellow")     << "Yellow")
            << (QStringList() << tr("Brown")      << "Brown");
 
+    QList<QStringList> bgThemes;
+    bgThemes << (QStringList() << tr("Light")   << "Light")
+             << (QStringList() << tr("Normal")  << "Normal")
+             << (QStringList() << tr("Dark")    << "Dark");
+
     for (int i = 0; i < sizes.length(); i++)
     {
         ui->gridSizeBox->insertItem(i, sizes.at(i).at(0), sizes.at(i).at(1));
@@ -266,6 +273,12 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
 
     int gridColumnCount = SETTINGS.value("Grid/columncount","4").toInt();
     ui->columnCountBox->setValue(gridColumnCount);
+
+    if (SETTINGS.value("Grid/autocolumns", "true").toString() == "true") {
+        toggleGridColumn(true);
+        ui->autoColumnOption->setChecked(true);
+    } else
+        toggleGridColumn(false);
 
     for (int i = 0; i < colors.length(); i++)
     {
@@ -297,18 +310,36 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
     } else
         toggleLabel(false);
 
-    ui->backgroundPath->setText(SETTINGS.value("Grid/background", "").toString());
+    for (int i = 0; i < bgThemes.length(); i++)
+    {
+        ui->bgThemeBox->insertItem(i, bgThemes.at(i).at(0), bgThemes.at(i).at(1));
+        if (currentBGTheme == bgThemes.at(i).at(1))
+            bgThemeIndex = i;
+    }
+    if (bgThemeIndex >= 0) ui->bgThemeBox->setCurrentIndex(bgThemeIndex);
+
+    QString imagePath = SETTINGS.value("Grid/background", "").toString();
+    ui->backgroundPath->setText(imagePath);
+    hideBGTheme(imagePath);
 
     if (SETTINGS.value("Grid/sortdirection", "ascending").toString() == "descending")
         ui->gridDescendingOption->setChecked(true);
 
+    connect(ui->autoColumnOption, SIGNAL(toggled(bool)), this, SLOT(toggleGridColumn(bool)));
+    connect(ui->backgroundPath, SIGNAL(textChanged(QString)), this, SLOT(hideBGTheme(QString)));
     connect(ui->backgroundButton, SIGNAL(clicked()), this, SLOT(browseBackground()));
     connect(ui->labelOption, SIGNAL(toggled(bool)), this, SLOT(toggleLabel(bool)));
 
 
     //Populate List tab
-    int listSizeIndex = 0;
+    int listSizeIndex = 0, listTextIndex = 0, listThemeIndex = 0;
     QString currentListSize = SETTINGS.value("List/imagesize","Medium").toString();
+    QString currentListText = SETTINGS.value("List/textsize","Medium").toString();
+    QString currentListTheme = SETTINGS.value("List/theme","Light").toString();
+
+    QList<QStringList> themes;
+    themes << (QStringList() << tr("Light") << "Light")
+           << (QStringList() << tr("Dark")  << "Dark");
 
     listCoverEnable << ui->listSizeLabel
                     << ui->listSizeBox;
@@ -327,8 +358,20 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
         ui->listSizeBox->insertItem(i, sizes.at(i).at(0), sizes.at(i).at(1));
         if (currentListSize == sizes.at(i).at(1))
             listSizeIndex = i;
+        ui->listTextBox->insertItem(i, sizes.at(i).at(0), sizes.at(i).at(1));
+        if (currentListText == sizes.at(i).at(1))
+            listTextIndex = i;
     }
     if (listSizeIndex >= 0) ui->listSizeBox->setCurrentIndex(listSizeIndex);
+    if (listTextIndex >= 0) ui->listTextBox->setCurrentIndex(listTextIndex);
+
+    for (int i = 0; i < themes.length(); i++)
+    {
+        ui->listThemeBox->insertItem(i, themes.at(i).at(0), themes.at(i).at(1));
+        if (currentListTheme == themes.at(i).at(1))
+            listThemeIndex = i;
+    }
+    if (listThemeIndex >= 0) ui->listThemeBox->setCurrentIndex(listThemeIndex);
 
     if (SETTINGS.value("List/sortdirection", "ascending").toString() == "descending")
         ui->listDescendingOption->setChecked(true);
@@ -343,7 +386,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, int activeTab) : QDialog(parent)
 
     //Populate Other tab
     int languageIndex = 0;
-    QString currentLanguage = SETTINGS.value("language", "EN").toString();
+    QString currentLanguage = SETTINGS.value("language", getDefaultLanguage()).toString();
 
     QList<QStringList> languages;
     languages << (QStringList() << QString::fromUtf8("English")  << "EN")
@@ -447,11 +490,12 @@ void SettingsDialog::browseCatalog()
 }
 
 
-void SettingsDialog::browseCen64()
+void SettingsDialog::browseEmulator()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("CEN64 Executable"));
+    QString path = QFileDialog::getOpenFileName(this, tr("<ParentName> Executable")
+                                                .replace("<ParentName>",ParentName));
     if (path != "")
-        ui->cen64Path->setText(path);
+        ui->emulatorPath->setText(path);
 }
 
 
@@ -540,7 +584,7 @@ void SettingsDialog::editSettings()
 
 
     //Paths tab
-    SETTINGS.setValue("Paths/cen64", ui->cen64Path->text());
+    SETTINGS.setValue("Paths/cen64", ui->emulatorPath->text());
     SETTINGS.setValue("Paths/pifrom", ui->pifPath->text());
     SETTINGS.setValue("Paths/ddiplrom", ui->ddPath->text());
     SETTINGS.setValue("Paths/catalog", ui->catalogPath->text());
@@ -617,8 +661,15 @@ void SettingsDialog::editSettings()
     //Grid tab
     SETTINGS.setValue("Grid/imagesize", ui->gridSizeBox->itemData(ui->gridSizeBox->currentIndex()));
     SETTINGS.setValue("Grid/columncount", ui->columnCountBox->value());
+
+    if (ui->autoColumnOption->isChecked())
+        SETTINGS.setValue("Grid/autocolumns", true);
+    else
+        SETTINGS.setValue("Grid/autocolumns", "");
+
     SETTINGS.setValue("Grid/inactivecolor", ui->shadowInactiveBox->itemData(ui->shadowInactiveBox->currentIndex()));
     SETTINGS.setValue("Grid/activecolor", ui->shadowActiveBox->itemData(ui->shadowActiveBox->currentIndex()));
+    SETTINGS.setValue("Grid/theme", ui->bgThemeBox->itemData(ui->bgThemeBox->currentIndex()));
     SETTINGS.setValue("Grid/background", ui->backgroundPath->text());
 
     if (ui->labelOption->isChecked())
@@ -655,6 +706,8 @@ void SettingsDialog::editSettings()
         SETTINGS.setValue("List/displaycover", "");
 
     SETTINGS.setValue("List/imagesize", ui->listSizeBox->itemData(ui->listSizeBox->currentIndex()));
+    SETTINGS.setValue("List/textsize", ui->listTextBox->itemData(ui->listTextBox->currentIndex()));
+    SETTINGS.setValue("List/theme", ui->listThemeBox->itemData(ui->listThemeBox->currentIndex()));
     SETTINGS.setValue("List/sort", ui->listSortBox->itemData(ui->listSortBox->currentIndex()));
 
     if (ui->listDescendingOption->isChecked())
@@ -675,6 +728,18 @@ void SettingsDialog::editSettings()
     SETTINGS.setValue("language", ui->languageBox->itemData(ui->languageBox->currentIndex()));
 
     close();
+}
+
+
+void SettingsDialog::hideBGTheme(QString imagePath)
+{
+    if (imagePath == "") {
+        ui->bgThemeLabel->setEnabled(true);
+        ui->bgThemeBox->setEnabled(true);
+    } else {
+        ui->bgThemeLabel->setEnabled(false);
+        ui->bgThemeBox->setEnabled(false);
+    }
 }
 
 
@@ -1021,6 +1086,15 @@ void SettingsDialog::toggleDownload(bool active)
 }
 
 
+void SettingsDialog::toggleGridColumn(bool active)
+{
+    if (active)
+        ui->columnCountBox->setEnabled(false);
+    else
+        ui->columnCountBox->setEnabled(true);
+}
+
+
 void SettingsDialog::toggleLabel(bool active)
 {
     foreach (QWidget *next, labelEnable)
@@ -1053,7 +1127,7 @@ void SettingsDialog::updateLanguageInfo()
 
     QTranslator translator;
     QString language = ui->languageBox->itemData(ui->languageBox->currentIndex()).toString().toLower();
-    QString resource = ":/locale/cen64-qt_"+language+".qm";
+    QString resource = ":/locale/"+AppNameLower+"_"+language+".qm";
     if (QFileInfo(resource).exists()) {
         translator.load(resource);
         ui->languageInfoLabel->setText(translator.translate("SettingsDialog", sourceText));

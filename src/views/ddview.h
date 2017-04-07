@@ -29,40 +29,32 @@
  *
  ***/
 
-#ifndef DOWNLOADDIALOG_H
-#define DOWNLOADDIALOG_H
+#ifndef DDVIEW_H
+#define DDVIEW_H
 
-#include <QDialog>
+#include <QTreeWidget>
 
-class QDialogButtonBox;
-class QGridLayout;
-class QLabel;
-class QLineEdit;
-class TheGamesDBScrapper;
+class TreeWidgetItem;
+struct Rom;
 
 
-
-class DownloadDialog : public QDialog
+class DDView : public QTreeWidget
 {
     Q_OBJECT
+
 public:
-    explicit DownloadDialog(QString fileText, QString defaultText, QString romMD5, QWidget *parent = 0);
+    explicit DDView(QWidget *parent = 0);
+    void addNoDiskRow();
+    QString getCurrentRomInfo(QString infoName);
+    bool hasSelectedRom();
 
 private:
-    QDialogButtonBox *downloadButtonBox;
-    QGridLayout *downloadLayout;
-    QLabel *fileLabel;
-    QLabel *gameNameLabel;
-    QLabel *gameIDLabel;
-    QLineEdit *gameNameField;
-    QLineEdit *gameIDField;
-    QString romMD5;
     QWidget *parent;
-
-    TheGamesDBScrapper *scrapper;
+    TreeWidgetItem *fileItem;
 
 private slots:
-    void runDownloader();
+    void addTo64DDView(Rom *currentRom);
+
 };
 
-#endif // DOWNLOADDIALOG_H
+#endif // DDVIEW_H

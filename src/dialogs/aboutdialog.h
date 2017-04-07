@@ -29,67 +29,33 @@
  *
  ***/
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef ABOUTDIALOG_H
+#define ABOUTDIALOG_H
 
-#include <QGraphicsDropShadowEffect>
-#include <QString>
-#include <QPixmap>
+#include <QDialog>
 
-class QColor;
-class QSize;
+class QDialogButtonBox;
+class QGridLayout;
+class QLabel;
+class QPlainTextEdit;
 
 
-struct Rom {
-    QString fileName;
-    QString directory;
-    QString romMD5;
-    QString internalName;
-    QString zipFile;
+class AboutDialog : public QDialog
+{
+    Q_OBJECT
 
-    QString baseName;
-    QString size;
-    int sortSize;
+public:
+    explicit AboutDialog(QWidget *parent = 0);
 
-    QString goodName;
-    QString CRC1;
-    QString CRC2;
-    QString players;
-    QString saveType;
-    QString rumble;
-
-    QString gameTitle;
-    QString releaseDate;
-    QString sortDate;
-    QString overview;
-    QString esrb;
-    QString genre;
-    QString publisher;
-    QString developer;
-    QString rating;
-
-    QPixmap image;
-
-    int count;
-    bool imageExists;
+private:
+    QDialogButtonBox *buttonBox;
+    QGridLayout *aboutLayout;
+    QLabel *copyrightLabel;
+    QLabel *descriptionLabel;
+    QLabel *githubLink;
+    QLabel *websiteLink;
+    QLabel *icon;
+    QPlainTextEdit *license;
 };
 
-bool romSorter(const Rom &firstRom, const Rom &lastRom);
-int getDefaultWidth(QString id, int imageWidth);
-int getGridSize(QString which);
-int getTableDataIndexFromName(QString infoName);
-int getTextSize();
-
-QByteArray byteswap(QByteArray romData);
-QStringList getZippedFiles(QString completeFileName);
-QByteArray *getZippedRom(QString romFileName, QString zipFile);
-QColor getColor(QString color, int transparency = 255);
-QString getDefaultLanguage();
-QString getTranslation(QString text);
-QGraphicsDropShadowEffect *getShadow(bool active);
-QSize getImageSize(QString view);
-QString getDataLocation();
-QString getRomInfo(QString identifier, const Rom *rom, bool removeWarn = false, bool sort = false);
-QString getVersion();
-
-#endif // COMMON_H
+#endif // ABOUTDIALOG_H

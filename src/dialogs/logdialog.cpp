@@ -30,7 +30,8 @@
  ***/
 
 #include "logdialog.h"
-#include "global.h"
+
+#include "../global.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -43,7 +44,7 @@
 
 LogDialog::LogDialog(QString lastOutput, QWidget *parent) : QDialog(parent)
 {
-    setWindowTitle(tr("CEN64 Log"));
+    setWindowTitle(tr("<ParentName> Log").replace("<ParentName>",ParentName));
     setMinimumSize(600, 400);
 
     logLayout = new QGridLayout(this);

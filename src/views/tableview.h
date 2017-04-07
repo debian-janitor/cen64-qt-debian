@@ -29,55 +29,50 @@
  *
  ***/
 
-#ifndef ROMCOLLECTION_H
-#define ROMCOLLECTION_H
+#ifndef TABLEVIEW_H
+#define TABLEVIEW_H
 
-#include <QObject>
-#include <QStringList>
-#include <QtSql/QSqlDatabase>
+#include <QTreeWidget>
 
-class QDir;
-class QProgressDialog;
-class TheGamesDBScrapper;
+class TreeWidgetItem;
 struct Rom;
 
 
-class RomCollection : public QObject
+class TableView : public QTreeWidget
 {
     Q_OBJECT
+
 public:
-    explicit RomCollection(QStringList fileTypes, QStringList romPaths, QWidget *parent = 0);
-    void cachedRoms(bool imageUpdated = false);
-    void updatePaths(QStringList romPaths);
+    explicit TableView(QWidget *parent = 0);
+    void addNoCartRow();
+    void addToTableView(Rom *currentRom);
+    QString getCurrentRomInfo(QString infoName);
+    bool hasSelectedRom();
+    void resetView(bool imageUpdated);
+    void saveColumnWidths();
+    void saveTablePosition();
 
-    QStringList getFileTypes(bool archives = false);
-    QStringList romPaths;
-
-public slots:
-    void addRoms();
+protected:
+    void keyPressEvent(QKeyEvent *event);
 
 signals:
-    void ddRomAdded(Rom *currentRom);
-    void romAdded(Rom *currentRom, int count);
-    void updateEnded(int romCount, bool cached = false);
-    void updateStarted(bool imageUpdated = false);
+    void enterPressed();
+    void tableActive();
 
 private:
-    void initializeRom(Rom *currentRom, bool cached);
-    void setupDatabase();
-    void setupProgressDialog(int size);
-
-    Rom addRom(QByteArray *romData, QString fileName, QString directory, QString zipFile, QSqlQuery query,
-               bool ddRom = false);
-
-    QStringList fileTypes;
-    QStringList scanDirectory(QDir romDir);
-
+    int positionx;
+    int positiony;
+    int savedTableRom;
+    QString savedTableRomFilename;
+    QStringList headerLabels;
+    QHeaderView *headerView;
     QWidget *parent;
-    QProgressDialog *progress;
-    QSqlDatabase database;
+    TreeWidgetItem *fileItem;
 
-    TheGamesDBScrapper *scrapper;
+private slots:
+    void saveSortOrder(int column, Qt::SortOrder order);
+    void setTablePosition();
+
 };
 
-#endif // ROMCOLLECTION_H
+#endif // TABLEVIEW_H
