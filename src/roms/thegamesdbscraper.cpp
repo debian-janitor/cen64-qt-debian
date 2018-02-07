@@ -239,6 +239,10 @@ void TheGamesDBScraper::downloadGameInfo(QString identifier, QString searchName,
             if (boxartURL != "") {
                 QUrl url("http://thegamesdb.net/banners/" + boxartURL);
 
+                //Delete current box art
+                QFile::remove(coverFile + "jpg");
+                QFile::remove(coverFile + "png");
+
                 //Check to save as JPG or PNG
                 boxartExt = QFileInfo(boxartURL).completeSuffix().toLower();
                 QFile cover(coverFile + boxartExt);
@@ -273,7 +277,12 @@ QByteArray TheGamesDBScraper::getUrlContents(QUrl url)
     QEventLoop loop;
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-    timer.start(10000);
+
+    int time = SETTINGS.value("Other/networktimeout", 10).toInt();
+    if (time == 0) time = 10;
+    time *= 1000;
+
+    timer.start(time);
     loop.exec();
 
     if(timer.isActive()) { //Got reply

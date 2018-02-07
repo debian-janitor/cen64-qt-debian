@@ -2,7 +2,7 @@
 
 A basic cross-platform frontend for [CEN64](http://cen64.com/).
 
-![CEN64-Qt Grid View](https://dl.dropboxusercontent.com/u/232085155/cen64-qt/github.jpg)
+![CEN64-Qt Grid View](https://raw.githubusercontent.com/dh4/cen64-qt/master/resources/demos/main.jpg)
 
 
 ## Getting CEN64-Qt
@@ -58,7 +58,7 @@ $ make
 
 #### Compiling QuaZIP statically
 
-You also have the option to compile QuaZIP statically. Download the QuaZIP sources from Sourceforge. Place the contents of `quazip-<version>/quazip/` in `quazip/` within the project directory. Then run:
+You also have the option to compile QuaZIP statically. Download the QuaZIP sources from Sourceforge. Place the contents of `quazip-<version>/quazip/` in `quazip5/` within the project directory. Then run:
 
 ```
 $ qmake CONFIG+=linux_quazip_static
