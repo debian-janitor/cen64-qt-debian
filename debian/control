@@ -2,7 +2,7 @@ Source: cen64-qt
 Section: otherosfs
 Priority: optional
 Maintainer: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Build-Depends: debhelper (>= 9), qtbase5-dev, libquazip5-dev, libqt5sql5-sqlite
+Build-Depends: debhelper (>= 11), qtbase5-dev, libquazip5-dev, libqt5sql5-sqlite
 Standards-Version: 3.9.6
 Homepage: https://github.com/dh4/cen64-qt
 Vcs-Git: git://github.com/glaubitz/cen64-qt-debian.git
