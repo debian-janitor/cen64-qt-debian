@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/glaubitz/cen64-qt-debian/
 
 Package: cen64-qt
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5sql5-sqlite
 Recommends: cen64
 Description: Cross-platform graphical frontend for the CEN64 emulator
  CEN64-Qt is a cross-platform graphical frontend for the CEN64 emulator. Since
