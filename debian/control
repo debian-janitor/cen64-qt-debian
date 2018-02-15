@@ -1,7 +1,7 @@
 Source: cen64-qt
 Section: otherosfs
 Priority: optional
-Maintainer: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Maintainer: Dan Hasting <maintainer@hasting.email>
 Build-Depends: debhelper (>= 11), qtbase5-dev, libquazip5-dev, libqt5sql5-sqlite
 Standards-Version: 4.1.3
 Homepage: https://github.com/dh4/cen64-qt
