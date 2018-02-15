@@ -1,0 +1,2 @@
+# Upstream versions it like this. Tell lintian to not complain:
+cen64-qt source: rc-version-greater-than-expected-version
