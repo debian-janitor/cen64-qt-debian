@@ -5,8 +5,8 @@ Maintainer: Dan Hasting <maintainer@hasting.email>
 Build-Depends: debhelper (>= 11), qtbase5-dev, libquazip5-dev, libqt5sql5-sqlite
 Standards-Version: 4.1.3
 Homepage: https://github.com/dh4/cen64-qt
-Vcs-Git: git://github.com/glaubitz/cen64-qt-debian.git
-Vcs-Browser: https://github.com/glaubitz/cen64-qt-debian/
+Vcs-Git: git://github.com/dh4/cen64-qt-debian.git
+Vcs-Browser: https://github.com/dh4/cen64-qt-debian/
 
 Package: cen64-qt
 Architecture: amd64
