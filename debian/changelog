@@ -2,14 +2,16 @@ cen64-qt (20180125-alpha-1) unstable; urgency=medium
 
   * New upstream release.
     - Fix FTBFS with libquazip5-headers. (Closes: #887530)
+  * New maintainer.
+    - Set myself as maintainer in debian/control.
   * Depend on libqt5sql5-sqlite.
   * Add manpage for cen64-qt.
   * Use compat level 11.
   * Declare compliance with Debian Policy 4.1.3.
+    - Use https for Vcs-Git location.
   * Remove comments from rules.
   * Override rc-version-greater-than-expected-version warning.
   * Update Vcs-Git location.
-  * Set myself as maintainer in debian/control.
 
  -- Dan Hasting <maintainer@hasting.email>  Thu, 15 Feb 2018 00:05:29 -0500
 
