@@ -1,3 +1,2 @@
-cen64-qt usr/bin
-resources/cen64-qt.desktop usr/share/applications
-resources/images usr/share/cen64-qt
+cen64-qt                      usr/bin
+resources/cen64-qt.desktop    usr/share/applications

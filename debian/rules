@@ -7,3 +7,7 @@ include /usr/share/dpkg/default.mk
 
 %:
 	dh $@
+
+override_dh_auto_install:
+	cp resources/images/cen64.png debian/cen64-qt/usr/share/icons/hicolor/128x128/apps/cen64-qt.png
+	dh_auto_install
