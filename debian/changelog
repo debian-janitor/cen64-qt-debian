@@ -1,3 +1,12 @@
+cen64-qt (20180730-alpha-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update location of icon.
+  * Declare compliance with Debian Policy 4.1.5.
+  * Update years in debian/copyright.
+
+ -- Dan Hasting <maintainer@hasting.email>  Wed, 01 Aug 2018 20:57:24 -0500
+
 cen64-qt (20180125-alpha-1) unstable; urgency=medium
 
   * New upstream release.
