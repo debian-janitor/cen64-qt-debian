@@ -36,6 +36,9 @@
 
 #include <QDir>
 #include <QEventLoop>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QMessageBox>
 #include <QTextStream>
 #include <QTimer>
@@ -44,7 +47,6 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-#include <QtXml/QDomDocument>
 
 
 TheGamesDBScraper::TheGamesDBScraper(QWidget *parent, bool force) : QObject(parent)
@@ -52,6 +54,46 @@ TheGamesDBScraper::TheGamesDBScraper(QWidget *parent, bool force) : QObject(pare
     this->parent = parent;
     this->force = force;
     this->keepGoing = true;
+}
+
+
+QString TheGamesDBScraper::convertIDs(QJsonObject foundGame, QString typeName, QString listName)
+{
+    QJsonArray idArray = foundGame.value(typeName).toArray();
+
+    QString cacheFileString = getCacheLocation() + typeName + ".json";
+    QFile cacheFile(cacheFileString);
+
+    cacheFile.open(QIODevice::ReadOnly);
+    QString data = cacheFile.readAll();
+    cacheFile.close();
+
+    QJsonDocument document = QJsonDocument::fromJson(data.toUtf8());
+    QJsonObject cache = document.object();
+
+    QString result = "";
+
+    foreach (QJsonValue id, idArray)
+    {
+        QString entryID = QString::number(id.toInt());
+        QString entryName = cache.value(entryID).toObject().value("name").toString();
+
+        if (entryName == "") {
+            updateListCache(&cacheFile, listName);
+            cacheFile.open(QIODevice::ReadOnly);
+            data = cacheFile.readAll();
+            cacheFile.close();
+
+            document = QJsonDocument::fromJson(data.toUtf8());
+            entryName = cache.value(entryID).toObject().value("name").toString();
+        }
+
+        if (entryName != "")
+            result += entryName + ", ";
+    }
+
+    int pos = result.lastIndexOf(QChar(','));
+    return result.left(pos);
 }
 
 
@@ -73,7 +115,7 @@ void TheGamesDBScraper::deleteGameInfo(QString fileName, QString identifier)
                                        QMessageBox::Yes | QMessageBox::No);
 
     if (answer == QMessageBox::Yes) {
-        QString gameCache = getDataLocation() + "/cache/" + identifier.toLower();
+        QString gameCache = getCacheLocation() + identifier.toLower();
 
         QString dataFile = gameCache + "/data.xml";
         QFile file(dataFile);
@@ -110,15 +152,27 @@ void TheGamesDBScraper::downloadGameInfo(QString identifier, QString searchName,
 
         bool updated = false;
 
-        QString gameCache = getDataLocation() + "/cache/" + identifier.toLower();
+        QString gameCache = getCacheLocation() + identifier.toLower();
         QDir cache(gameCache);
 
         if (!cache.exists()) {
             cache.mkpath(gameCache);
         }
 
-        //Get game XML info from thegamesdb.net
-        QString dataFile = gameCache + "/data.xml";
+        QFile genres(getCacheLocation() + "genres.json");
+        if (!genres.exists())
+            updateListCache(&genres, "Genres");
+
+        QFile developers(getCacheLocation() + "developers.json");
+        if (!developers.exists())
+            updateListCache(&developers, "Developers");
+
+        QFile publishers(getCacheLocation() + "publishers.json");
+        if (!publishers.exists())
+            updateListCache(&publishers, "Publishers");
+
+        //Get game JSON info from thegamesdb.net
+        QString dataFile = gameCache + "/data.json";
         QFile file(dataFile);
 
         if (!file.exists() || file.size() == 0 || force) {
@@ -128,44 +182,68 @@ void TheGamesDBScraper::downloadGameInfo(QString identifier, QString searchName,
             searchName.remove(QRegExp("\\W*(\\(|\\[).+(\\)|\\])\\W*"));
 
             //Few game specific hacks
-            //TODO: Contact thegamesdb.net and see if these can be fixed on their end
-            if (searchName == "Legend of Zelda, The - Majora's Mask")
+            if (searchName == "Legend of Zelda, The - Majora's Mask" ||
+                searchName == "ZELDA MAJORA'S MASK")
                 searchName = "Majora's Mask";
-            else if (searchName == "Legend of Zelda, The - Ocarina of Time - Master Quest")
-                searchName = "Master Quest";
             else if (searchName == "Legend of Zelda, The - Ocarina of Time" ||
                      searchName == "THE LEGEND OF ZELDA")
-                searchName = "Ocarina of Time";
-            else if (searchName.toLower() == "f-zero x")
-                gameID = "10836";
+                searchName = "The Legend of Zelda: Ocarina of Time";
+            else if (searchName.toLower().startsWith("tsumi to batsu"))
+                searchName = "Sin and Punishment";
+            else if (searchName.toLower() == "1080 snowboarding")
+                searchName = "1080: TenEighty Snowboarding";
+            else if (searchName == "Extreme-G XG2" || searchName == "Extreme G 2")
+                searchName = "Extreme-G 2";
+            else if (searchName.contains("Pokemon", Qt::CaseInsensitive))
+                searchName.replace("Pokemon", "Pokémon", Qt::CaseInsensitive);
+            else if (searchName.toLower() == "smash brothers")
+                searchName = "Super Smash Bros.";
+            else if (searchName.toLower() == "conker bfd")
+                searchName = "Conker's Bad Fur Day";
+
+            QString apiFilter = "&filter[platform]=3&include=boxart&fields=game_title,release_date,";
+            apiFilter += "developers,publishers,genres,overview,rating,players";
 
             //If user submits gameID, use that
             if (gameID != "")
-                url.setUrl("http://thegamesdb.net/api/GetGame.php?id="
-                           + gameID + "&platform=Nintendo 64");
+                url.setUrl("https://api.thegamesdb.net/Games/ByGameID?apikey=" + TheGamesDBAPIKey + "&id="
+                           + gameID + apiFilter);
             else
-                url.setUrl("http://thegamesdb.net/api/GetGame.php?name="
-                           + searchName + "&platform=Nintendo 64");
+                url.setUrl("https://api.thegamesdb.net/Games/ByGameName?apikey=" + TheGamesDBAPIKey + "&name="
+                           + searchName + apiFilter);
 
-            QString dom = getUrlContents(url);
+            QString data = getUrlContents(url);
 
-            QDomDocument xml;
-            xml.setContent(dom);
-            QDomNode node = xml.elementsByTagName("Data").at(0).firstChildElement("Game");
+            QJsonDocument document = QJsonDocument::fromJson(data.toUtf8());
+            QJsonObject json = document.object();
+
+            if (json.value("code").toInt() != 200 && json.value("code").toInt() != 0) {
+                QString status = json.value("status").toString();
+                QString message;
+                message = QString(tr("The following error from TheGamesDB occured while downloading:"))
+                                   + "<br /><br />" + status + "<br /><br />";
+                showError(message);
+                if (force) parent->setEnabled(true);
+                return;
+            }
+
+            QJsonValue games = json.value("data").toObject().value("games");
+            QJsonArray gamesArray = games.toArray();
+
 
             int count = 0, found = 0;
 
-            while(!node.isNull())
+            foreach (QJsonValue game, gamesArray)
             {
-                QDomElement element = node.firstChildElement("GameTitle").toElement();
+                QJsonValue title = game.toObject().value("game_title");
 
                 if (force) { //from user dialog
-                    QDomElement date = node.firstChildElement("ReleaseDate").toElement();
+                    QJsonValue date = game.toObject().value("release_date");
 
-                    QString check = "Game: " + element.text();
+                    QString check = "Game: " + title.toString();
                     check.remove(QRegExp(QString("[^A-Za-z 0-9 \\.,\\?'""!@#\\$%\\^&\\*\\")
-                                         + "(\\)-_=\\+;:<>\\/\\\\|\\}\\{\\[\\]`~]*"));
-                    if (date.text() != "") check += "\n" + tr("Released on: ") + date.text();
+                                         + "(\\)-_=\\+;:<>\\/\\\\|\\}\\{\\[\\]`~é]*"));
+                    if (date.toString() != "") check += "\n" + tr("Released on: ") + date.toString();
                     check += "\n\n" + tr("Does this look correct?");
 
                     int answer = QMessageBox::question(parent, QObject::tr("Game Information Download"),
@@ -179,21 +257,57 @@ void TheGamesDBScraper::downloadGameInfo(QString identifier, QString searchName,
                 } else {
                     //We only want one game, so search for a perfect match in the GameTitle element.
                     //Otherwise this will default to 0 (the first game found)
-                    if(element.text() == searchName)
+                    if(title.toString().toLower() == searchName.toLower())
                         found = count;
                 }
 
-                node = node.nextSibling();
                 count++;
             }
 
             if (!force || updated) {
+                QJsonObject foundGame = gamesArray.at(found).toObject();
+                QJsonObject saveData;
+
+                QString gameID = QString::number(foundGame.value("id").toInt());
+                QJsonObject boxart = json.value("include").toObject().value("boxart").toObject();
+
+                QString thumbURL = boxart.value("base_url").toObject().value("thumb").toString();
+                QJsonArray imgArray = boxart.value("data").toObject().value(gameID).toArray();
+
+                QString frontImg = "";
+
+                foreach (QJsonValue img, imgArray)
+                {
+                    QString type = img.toObject().value("type").toString();
+                    QString side = img.toObject().value("side").toString();
+                    QString filename = img.toObject().value("filename").toString();
+
+                    if (type == "boxart" && side == "front")
+                        frontImg = thumbURL + filename;
+                }
+
+                //Convert IDs from API to text names
+                QString genresString = convertIDs(foundGame, "genres", "Genres");
+                QString developerString = convertIDs(foundGame, "developers", "Developers");
+                QString publisherString = convertIDs(foundGame, "publishers", "Publishers");
+
+                QString players = QString::number(foundGame.value("players").toInt());
+                if (players == "0") players = "";
+
+                saveData.insert("game_title", foundGame.value("game_title").toString());
+                saveData.insert("release_date", foundGame.value("release_date").toString());
+                saveData.insert("rating", foundGame.value("rating").toString());
+                saveData.insert("overview", foundGame.value("overview").toString());
+                saveData.insert("players", players);
+                saveData.insert("boxart", frontImg);
+                saveData.insert("genres", genresString);
+                saveData.insert("developer", developerString);
+                saveData.insert("publisher", publisherString);
+
+                QJsonDocument document(saveData);
+
                 file.open(QIODevice::WriteOnly);
-                QTextStream stream(&file);
-
-                QDomNodeList gameList = xml.elementsByTagName("Game");
-                gameList.at(found).save(stream, QDomNode::EncodingFromDocument);
-
+                file.write(document.toJson());
                 file.close();
             }
 
@@ -220,24 +334,15 @@ void TheGamesDBScraper::downloadGameInfo(QString identifier, QString searchName,
 
         if ((!coverJPG.exists() && !coverPNG.exists()) || (force && updated)) {
             file.open(QIODevice::ReadOnly);
-            QString dom = file.readAll();
+            QString data = file.readAll();
             file.close();
 
-            QDomDocument xml;
-            xml.setContent(dom);
-            QDomNode node = xml.elementsByTagName("Game").at(0).firstChildElement("Images").firstChild();
-
-            while(!node.isNull())
-            {
-                QDomElement element = node.toElement();
-                if(element.tagName() == "boxart" && element.attribute("side") == "front")
-                    boxartURL = element.attribute("thumb");
-
-                node = node.nextSibling();
-            }
+            QJsonDocument document = QJsonDocument::fromJson(data.toUtf8());
+            QJsonObject json = document.object();
+            QString boxartURL = json.value("boxart").toString();
 
             if (boxartURL != "") {
-                QUrl url("http://thegamesdb.net/banners/" + boxartURL);
+                QUrl url(boxartURL);
 
                 //Delete current box art
                 QFile::remove(coverFile + "jpg");
@@ -312,5 +417,21 @@ void TheGamesDBScraper::showError(QString error)
 
         if (answer == QMessageBox::No)
             keepGoing = false;
+    }
+}
+
+
+void TheGamesDBScraper::updateListCache(QFile *file, QString list)
+{
+    if (keepGoing) {
+        QUrl url;
+        url.setUrl("https://api.thegamesdb.net/" + list + "?apikey=" + TheGamesDBAPIKey);
+        QString data = getUrlContents(url);
+        QJsonDocument document = QJsonDocument::fromJson(data.toUtf8());
+        QJsonDocument result(document.object().value("data").toObject().value(list.toLower()).toObject());
+
+        file->open(QIODevice::WriteOnly);
+        file->write(result.toJson());
+        file->close();
     }
 }
