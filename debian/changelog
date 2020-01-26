@@ -1,3 +1,12 @@
+cen64-qt (20191009-alpha-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Switch to compat level 12.
+  * Declare compliance with Debian Policy 4.5.0.
+  * Update years in debian/copyright.
+
+ -- Dan Hasting <maintainer@hasting.email>  Sun, 26 Jan 2020 04:51:24 -0500
+
 cen64-qt (20180730-alpha-1) unstable; urgency=medium
 
   * New upstream release.
