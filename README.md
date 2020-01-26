@@ -1,6 +1,6 @@
 # CEN64-Qt [![Build Status](https://travis-ci.org/dh4/cen64-qt.svg?branch=master)](https://travis-ci.org/dh4/cen64-qt)
 
-A customizable cross-platform frontend for [CEN64](http://cen64.com/).
+A customizable cross-platform frontend for [CEN64](https://github.com/n64dev/cen64).
 
 ![CEN64-Qt Grid View](https://raw.githubusercontent.com/dh4/cen64-qt/master/resources/demos/main.jpg)
 
@@ -40,21 +40,6 @@ $ make
 ```
 
 If qmake returns "qmake: could not find a Qt installation of ''", you can try running `QT_SELECT=qt5 qmake` or `/usr/lib/x86_64-linux-gnu/qt5/bin/qmake`. Some distributions also contain a `qmake-qt5` symlink.
-
-#### Building with Qt4
-
-Install the Qt4 dependencies instead. On Debian/Ubuntu:
-
-```
-# apt-get install qt4-qmake g++ libqt4-dev libquazip-dev libqt4-sql-sqlite
-```
-
-Then create the Makefile with qmake and build with make. Run the following commands from the directory that contains cen64-qt.pro:
-
-```
-$ qmake-qt4
-$ make
-```
 
 #### Compiling QuaZIP statically
 

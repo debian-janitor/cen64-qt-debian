@@ -59,6 +59,7 @@
 #include <QListWidget>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QOperatingSystemVersion>
 #include <QSplitter>
 #include <QStatusBar>
 #include <QTimer>
@@ -265,16 +266,17 @@ void MainWindow::createMenu()
 
     viewMenu->addSeparator();
 
-#if QT_VERSION >= 0x050000
     //OSX El Capitan adds it's own full-screen option
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    if (!(QOperatingSystemVersion::current() >= QOperatingSystemVersion::OSXElCapitan &&
+            QOperatingSystemVersion::currentType() == QOperatingSystemVersion::MacOS))
+#else
     if (QSysInfo::macVersion() < QSysInfo::MV_ELCAPITAN || QSysInfo::macVersion() == QSysInfo::MV_None)
+#endif
         fullScreenAction = viewMenu->addAction(tr("&Full-screen"));
     else
         fullScreenAction = new QAction(this);
     statusBarAction = viewMenu->addAction(tr("&Status Bar"));
-#else
-    fullScreenAction = viewMenu->addAction(tr("&Full-screen"));
-#endif
 
     fullScreenAction->setCheckable(true);
     statusBarAction->setCheckable(true);
@@ -365,14 +367,13 @@ void MainWindow::createRomView()
     //Create disabled view
     disabledView = new QWidget(this);
     disabledView->setHidden(true);
-    disabledView->setDisabled(true);
 
     disabledLayout = new QVBoxLayout(disabledView);
     disabledLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
     disabledView->setLayout(disabledLayout);
 
-    QString disabledText = QString("Add a directory containing ROMs under ")
-                         + "Settings->Configure->Paths to use this view.";
+    QString disabledText = QString(tr("Add a directory containing ROMs under "))
+                         + tr("Settings->Configure->Paths to use this view.");
     disabledLabel = new QLabel(disabledText, disabledView);
     disabledLabel->setWordWrap(true);
     disabledLabel->setAlignment(Qt::AlignCenter);
@@ -512,12 +513,7 @@ bool MainWindow::eventFilter(QObject*, QEvent *event)
     if (event->type() == QEvent::HoverMove && isFullScreen()) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
-        //x and y axis are reversed in Qt4
-#if QT_VERSION >= 0x050000
         int mousePos = mouseEvent->pos().y();
-#else
-        int mousePos = mouseEvent->pos().x();
-#endif
 
         if (mousePos < 5)
             showMenuBar(true);
@@ -533,9 +529,13 @@ bool MainWindow::eventFilter(QObject*, QEvent *event)
             updateFullScreenMode();
     }
 
-#if QT_VERSION >= 0x050000
     //OSX El Capitan adds it's own full-screen option, so handle the event change here
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::OSXElCapitan &&
+            QOperatingSystemVersion::currentType() == QOperatingSystemVersion::MacOS) {
+#else
     if (QSysInfo::macVersion() >= QSysInfo::MV_ELCAPITAN && QSysInfo::macVersion() != QSysInfo::MV_None) {
+#endif
         if (event->type() == QEvent::WindowStateChange) {
             QWindowStateChangeEvent *windowEvent = static_cast<QWindowStateChangeEvent*>(event);
 
@@ -552,7 +552,6 @@ bool MainWindow::eventFilter(QObject*, QEvent *event)
             }
         }
     }
-#endif
 
     return false;
 }
@@ -732,11 +731,7 @@ void MainWindow::openRom()
     foreach (QString type, romCollection->getFileTypes(true)) filter += type + " ";
     filter += ");;" + tr("All Files") + " (*)";
 
-#if QT_VERSION >= 0x050000
     QString searchPath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
-#else
-    QString searchPath = QDesktopServices::storageLocation(QDesktopServices::HomeLocation);
-#endif
     if (romCollection->romPaths.count() > 0)
         searchPath = romCollection->romPaths.at(0);
 
@@ -791,7 +786,7 @@ void MainWindow::openZipDialog(QStringList zippedFiles)
 
     zipButtonBox = new QDialogButtonBox(Qt::Horizontal, zipDialog);
     zipButtonBox->addButton(tr("Launch"), QDialogButtonBox::AcceptRole);
-    zipButtonBox->addButton(QDialogButtonBox::Cancel);
+    zipButtonBox->addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
 
     zipLayout->addWidget(zipList, 0, 0);
     zipLayout->addWidget(zipButtonBox, 1, 0);
