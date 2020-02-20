@@ -1,3 +1,10 @@
+cen64-qt (20200219-alpha-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Simplify debian/rules.
+
+ -- Dan Hasting <maintainer@hasting.email>  Wed, 19 Feb 2020 23:08:06 -0500
+
 cen64-qt (20191009-alpha-1) unstable; urgency=medium
 
   * New upstream release.
