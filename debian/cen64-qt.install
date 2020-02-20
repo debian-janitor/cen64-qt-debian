@@ -1,2 +1,3 @@
 cen64-qt                      usr/bin
 resources/cen64-qt.desktop    usr/share/applications
+resources/images/cen64-qt.png usr/share/icons/hicolor/128x128/apps
