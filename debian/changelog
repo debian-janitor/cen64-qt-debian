@@ -1,3 +1,9 @@
+cen64-qt (20200219-alpha-2) UNRELEASED; urgency=medium
+
+  * Move source package lintian overrides to debian/source.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Tue, 21 Apr 2020 08:24:34 +0000
+
 cen64-qt (20200219-alpha-1) unstable; urgency=medium
 
   * New upstream release.
