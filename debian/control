@@ -3,7 +3,7 @@ Section: otherosfs
 Priority: optional
 Maintainer: Dan Hasting <maintainer@hasting.email>
 Rules-Requires-Root: no
-Build-Depends: debhelper (>= 12), qtbase5-dev, libquazip5-dev, libqt5sql5-sqlite
+Build-Depends: debhelper-compat (= 12), qtbase5-dev, libquazip5-dev, libqt5sql5-sqlite
 Standards-Version: 4.5.0
 Homepage: https://github.com/dh4/cen64-qt
 Vcs-Git: https://github.com/dh4/cen64-qt-debian.git
